@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Color Shop</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+label {
+  display: block;
+  margin: 10px 0;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+input[type="number"] {
+  margin-top: 10px;
+  padding: 8px;
+  width: 100px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  margin-top: 25px;
+  padding: 12px 30px;
+  font-size: 18px;
+  background: #00b894;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #019f7a;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Buy Your Color</h1>
+
+  <div>
+    <label>
+      <input type="radio" name="color" value="yellow" data-price="1000"> Yellow - 1000 DZD
+    </label>
+    <label>
+      <input type="radio" name="color" value="blue" data-price="2500"> Blue - 2500 DZD
+    </label>
+    <label>
+      <input type="radio" name="color" value="orange" data-price="custom"> Orange - Custom Amount
+    </label>
+    <input type="number" id="customAmount" placeholder="Enter amount" disabled>
+  </div>
+
+  <button id="payButton">Pay Now</button>
+</div>
+
+<script>
+const radios = document.querySelectorAll('input[name="color"]');
+const customInput = document.getElementById('customAmount');
+const payButton = document.getElementById('payButton');
+
+radios.forEach(radio => {
+  radio.addEventListener('change', () => {
+    customInput.disabled = radio.value !== 'orange';
+    if (radio.value !== 'orange') customInput.value = '';
+  });
+});
+
+payButton.addEventListener('click', async () => {
+  const selected = document.querySelector('input[name="color"]:checked');
+  if (!selected) return alert("Please select a color!");
+
+  const amount =
+    selected.dataset.price === 'custom'
+      ? Number(customInput.value)
+      : Number(selected.dataset.price);
+
+  if (!amount || amount <= 0) return alert("Please enter a valid amount!");
+
+  try {
+    const res = await fetch('/api/create-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount,
+        color: selected.value
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert("Error creating payment.");
+      console.error(data);
+    }
+
+  } catch (err) {
+    alert("Something went wrong.");
+    console.error(err);
+  }
+});
+</script>
+
+</body>
+</html>
