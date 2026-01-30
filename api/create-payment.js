@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         amount: Math.round(amount * 100),
-        currency: "DZD",
+        currency: "dzd",
         description: `Color purchase: ${color}`,
         success_url: `${req.headers.origin}/success.html`,
         failure_url: `${req.headers.origin}/cancel.html`
