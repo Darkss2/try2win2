@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     }
 
     // Chargily TEST endpoint
-    const chargilyUrl = "https://pay.chargily.net/test/api/v2/checkouts";
+    const chargilyUrl = "https://pay.chargily.net/api/v2/checkouts";
 
     const response = await fetch(chargilyUrl, {
       method: "POST",
